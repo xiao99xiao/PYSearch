@@ -11,6 +11,7 @@
 #define PYRectangleTagMaxCol 3
 #define PYTextColor PYSEARCH_COLOR(113, 113, 113)
 #define PYSEARCH_COLORPolRandomColor self.colorPol[arc4random_uniform((uint32_t)self.colorPol.count)]
+#define PYOnePixel (1 / [UIScreen mainScreen].scale)
 
 @interface PYSearchViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource, PYSearchSuggestionViewDataSource>
 
@@ -515,13 +516,13 @@
         verticalLine.py_height = contentView.py_height;
         verticalLine.alpha = 0.7;
         verticalLine.py_x = contentView.py_width / PYRectangleTagMaxCol * (i + 1);
-        verticalLine.py_width = 0.5;
+        verticalLine.py_width = PYOnePixel;
         [contentView addSubview:verticalLine];
     }
     
     for (int i = 0; i < ceil(((double)self.hotSearches.count / PYRectangleTagMaxCol)) - 1; i++) {
         UIImageView *verticalLine = [[UIImageView alloc] initWithImage:[NSBundle py_imageNamed:@"cell-content-line"]];
-        verticalLine.py_height = 0.5;
+        verticalLine.py_height = PYOnePixel;
         verticalLine.alpha = 0.7;
         verticalLine.py_y = rectangleTagH * (i + 1);
         verticalLine.py_width = contentView.py_width;
@@ -575,7 +576,7 @@
         [rankView addSubview:rankTextLabel];
         
         UIImageView *line = [[UIImageView alloc] initWithImage:[NSBundle py_imageNamed:@"cell-content-line"]];
-        line.py_height = 0.5;
+        line.py_height = PYOnePixel;
         line.alpha = 0.7;
         line.py_x = -PYScreenW * 0.5;
         line.py_y = rankView.py_height - 1;
@@ -888,14 +889,14 @@
             for (UILabel *tag in self.searchHistoryTags) {
                 tag.backgroundColor = [UIColor clearColor];
                 tag.layer.borderColor = PYSEARCH_COLOR(223, 223, 223).CGColor;
-                tag.layer.borderWidth = 0.5;
+                tag.layer.borderWidth = PYOnePixel;
             }
             break;
         case PYSearchHistoryStyleARCBorderTag:
             for (UILabel *tag in self.searchHistoryTags) {
                 tag.backgroundColor = [UIColor clearColor];
                 tag.layer.borderColor = PYSEARCH_COLOR(223, 223, 223).CGColor;
-                tag.layer.borderWidth = 0.5;
+                tag.layer.borderWidth = PYOnePixel;
                 tag.layer.cornerRadius = tag.py_height * 0.5;
             }
             break;
@@ -921,14 +922,14 @@
             for (UILabel *tag in self.hotSearchTags) {
                 tag.backgroundColor = [UIColor clearColor];
                 tag.layer.borderColor = PYSEARCH_COLOR(223, 223, 223).CGColor;
-                tag.layer.borderWidth = 0.5;
+                tag.layer.borderWidth = PYOnePixel;
             }
             break;
         case PYHotSearchStyleARCBorderTag:
             for (UILabel *tag in self.hotSearchTags) {
                 tag.backgroundColor = [UIColor clearColor];
                 tag.layer.borderColor = PYSEARCH_COLOR(223, 223, 223).CGColor;
-                tag.layer.borderWidth = 0.5;
+                tag.layer.borderWidth = PYOnePixel;
                 tag.layer.cornerRadius = tag.py_height * 0.5;
             }
             break;
@@ -1218,7 +1219,7 @@
         closeView.contentMode = UIViewContentModeCenter;
         cell.accessoryView = closetButton;
         UIImageView *line = [[UIImageView alloc] initWithImage:[NSBundle py_imageNamed:@"cell-content-line"]];
-        line.py_height = 0.5;
+        line.py_height = PYOnePixel;
         line.alpha = 0.7;
         line.py_x = PYSEARCH_MARGIN;
         line.py_y = 43;
