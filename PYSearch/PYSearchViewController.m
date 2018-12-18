@@ -13,7 +13,9 @@
 #define PYSEARCH_COLORPolRandomColor self.colorPol[arc4random_uniform((uint32_t)self.colorPol.count)]
 #define PYOnePixel (1 / [UIScreen mainScreen].scale)
 
-@interface PYSearchViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource, PYSearchSuggestionViewDataSource>
+@interface PYSearchViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource, PYSearchSuggestionViewDataSource, UIGestureRecognizerDelegate> {
+    id <UIGestureRecognizerDelegate> _previousInteractivePopGestureRecognizerDelegate;
+}
 
 /**
  The header view of search view
@@ -117,62 +119,85 @@
 - (void)viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
-
+    
     if (self.currentOrientation != [[UIDevice currentDevice] orientation]) { // orientation changed, reload layout
         self.hotSearches = self.hotSearches;
         self.searchHistories = self.searchHistories;
         self.currentOrientation = [[UIDevice currentDevice] orientation];
     }
-
+    
     CGFloat adaptWidth = 0.0;
-    if (self.searchViewControllerShowMode == PYSearchViewControllerShowModePush) {
-        UIButton *backButton = self.navigationItem.leftBarButtonItem.customView;
-        adaptWidth = backButton.py_width;
-    } else if (self.searchViewControllerShowMode == PYSearchViewControllerShowModeModal) {
-        UIButton *cancelButton = self.navigationItem.rightBarButtonItem.customView;
-        self.cancelButtonWidth = cancelButton.py_width > self.cancelButtonWidth ? cancelButton.py_width : self.cancelButtonWidth;
-        adaptWidth = self.cancelButtonWidth;
+    UISearchBar *searchBar = self.searchBar;
+    UITextField *searchField = self.searchTextField;
+    UIView *titleView = self.navigationItem.titleView;
+    UIButton *backButton = self.navigationItem.leftBarButtonItem.customView;
+    UIButton *cancelButton = self.navigationItem.rightBarButtonItem.customView;
+    UIEdgeInsets backButtonLayoutMargins = UIEdgeInsetsZero;
+    UIEdgeInsets cancelButtonLayoutMargins = UIEdgeInsetsZero;
+    UIEdgeInsets navigationBarLayoutMargins = UIEdgeInsetsZero;
+    UINavigationBar *navigationBar = self.navigationController.navigationBar;
+    
+    if (@available(iOS 8.0, *)) {
+        backButton.layoutMargins = UIEdgeInsetsMake(8, 0, 8, 8);
+        backButtonLayoutMargins = backButton.layoutMargins;
+        cancelButton.layoutMargins = UIEdgeInsetsMake(8, 8, 8, 0);
+        cancelButtonLayoutMargins = cancelButton.layoutMargins;
+        navigationBarLayoutMargins = navigationBar.layoutMargins;
     }
     
+    if (self.searchViewControllerShowMode == PYSearchViewControllerShowModePush) {
+        UIButton *backButton = self.navigationItem.leftBarButtonItem.customView;
+        UIImageView *imageView = backButton.imageView;
+        UIView *titleLabel = backButton.titleLabel;
+        
+        [backButton sizeToFit];
+        [imageView sizeToFit];
+        [titleLabel sizeToFit];
+        
+        backButton.py_height = navigationBar.py_height;
+        backButton.py_width = titleLabel.py_width + imageView.py_width / 2.0 + backButtonLayoutMargins.left + backButtonLayoutMargins.right;
+        adaptWidth = backButton.py_width + 8;
+    } else { // Default is PYSearchViewControllerShowModeModal
+        [cancelButton sizeToFit];
+        [cancelButton.titleLabel sizeToFit];
+        self.cancelButtonWidth = cancelButton.py_width + cancelButtonLayoutMargins.left + cancelButtonLayoutMargins.right;
+        adaptWidth = self.cancelButtonWidth + 8;
+    }
+    
+    adaptWidth = adaptWidth + navigationBarLayoutMargins.left + navigationBarLayoutMargins.right;
     // Adapt the search bar layout problem in the navigation bar on iOS 11
     // More details : https://github.com/iphone5solo/PYSearch/issues/108
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 11.0) { // iOS 11
-        UINavigationBar *navBar = self.navigationController.navigationBar;
-        if (self.navigationItem.rightBarButtonItem) { // Cancel button
-            CGFloat space = 8;
-            navBar.layoutMargins = UIEdgeInsetsZero;
-            for (UIView *subview in navBar.subviews) {
-                if ([NSStringFromClass(subview.class) containsString:@"ContentView"]) {
-                    subview.layoutMargins = UIEdgeInsetsMake(0, space, 0, space); // Fix cancel button width is modified
-                    break;
-                }
+    if (@available(iOS 11.0, *)) { // iOS 11
+        if (self.searchViewControllerShowMode == PYSearchViewControllerShowModeModal) {
+            if (navigationBarLayoutMargins.left > PYSEARCH_MARGIN) {
+                searchBar.py_x = 0;
+            } else {
+                searchBar.py_x = PYSEARCH_MARGIN - navigationBarLayoutMargins.left;
             }
         }
-        _searchBar.py_width = self.view.py_width - adaptWidth - PYSEARCH_MARGIN * 4;
-        _searchBar.py_height = self.view.py_width > self.view.py_height ? 24 : 30;
-        _searchTextField.frame = _searchBar.bounds;
+        searchBar.py_height = self.view.py_width > self.view.py_height ? 24 : 30;
+        searchBar.py_width = self.view.py_width - adaptWidth - PYSEARCH_MARGIN;
+        searchField.frame = searchBar.bounds;
+        cancelButton.py_width = self.cancelButtonWidth;
     } else {
-        UIView *titleView = self.navigationItem.titleView;
-        titleView.py_x = PYSEARCH_MARGIN * 1.5;
-        titleView.py_y = self.view.py_width > self.view.py_height ? 3 : 7;
-        titleView.py_width = self.view.py_width - self.cancelButtonWidth - titleView.py_x * 2 - 3;
+        titleView.py_y = self.view.py_width > self.view.py_height ? 4 : 7;
         titleView.py_height = self.view.py_width > self.view.py_height ? 24 : 30;
+        if (self.searchViewControllerShowMode == PYSearchViewControllerShowModePush) {
+            titleView.py_width = self.view.py_width - adaptWidth - PYSEARCH_MARGIN;
+        } else {
+            titleView.py_x = PYSEARCH_MARGIN * 1.5;
+            titleView.py_width = self.view.py_width - self.cancelButtonWidth - titleView.py_x * 2 - 3;
+        }
     }
+}
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+    [self viewDidLayoutSubviews];
 }
 
 - (BOOL)prefersStatusBarHidden
 {
     return NO;
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    if (NULL == self.searchResultController.parentViewController) {
-        [self.searchBar becomeFirstResponder];
-    } else if (YES == self.showKeyboardWhenReturnSearchResult) {
-        [self.searchBar becomeFirstResponder];
-    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -191,6 +216,18 @@
             self.navigationController.navigationBar.barTintColor = PYSEARCH_COLOR(249, 249, 249);
         }
     }
+    
+    if (NULL == self.searchResultController.parentViewController) {
+        [self.searchBar becomeFirstResponder];
+    } else if (YES == self.showKeyboardWhenReturnSearchResult) {
+        [self.searchBar becomeFirstResponder];
+    }
+    if (_searchViewControllerShowMode == PYSearchViewControllerShowModePush) {
+        if (self.navigationController.viewControllers.count > 1) {
+            _previousInteractivePopGestureRecognizerDelegate = self.navigationController.interactivePopGestureRecognizer.delegate;
+            self.navigationController.interactivePopGestureRecognizer.delegate = self;
+        }
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -198,6 +235,10 @@
     [super viewWillDisappear:animated];
     
     [self.searchBar resignFirstResponder];
+    
+    if (_searchViewControllerShowMode == PYSearchViewControllerShowModePush) {
+        self.navigationController.interactivePopGestureRecognizer.delegate = _previousInteractivePopGestureRecognizerDelegate;
+    }
 }
 
 - (void)dealloc
@@ -360,23 +401,28 @@
     self.navigationController.navigationBar.backIndicatorImage = nil;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
     UIButton *cancleButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    cancleButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    cancleButton.titleLabel.font = [UIFont systemFontOfSize:17];
     [cancleButton setTitle:[NSBundle py_localizedStringForKey:PYSearchCancelButtonText] forState:UIControlStateNormal];
     [cancleButton addTarget:self action:@selector(cancelDidClick)  forControlEvents:UIControlEventTouchUpInside];
+    cancleButton.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+    cancleButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
     [cancleButton sizeToFit];
     cancleButton.py_width += PYSEARCH_MARGIN;
     self.cancelButton = cancleButton;
     self.cancelBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:cancleButton];
     UIButton *backButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    backButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+    UIImage *backImage = [NSBundle py_imageNamed:@"back"];
+    backButton.titleLabel.font = [UIFont systemFontOfSize:17];
     [backButton setTitle:[NSBundle py_localizedStringForKey:PYSearchBackButtonText] forState:UIControlStateNormal];
-    [backButton setImage:[NSBundle py_imageNamed:@"back"] forState:UIControlStateNormal];
+    [backButton setImage:backImage forState:UIControlStateNormal];
     [backButton addTarget:self action:@selector(backDidClick)  forControlEvents:UIControlEventTouchUpInside];
+    backButton.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+    backButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    [backButton.imageView sizeToFit];
+    backButton.contentEdgeInsets = UIEdgeInsetsMake(0, -ceil(backImage.size.width / 2.0), 0, 0);
+    backButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
     [backButton sizeToFit];
-    
-    backButton.contentEdgeInsets = UIEdgeInsetsMake(0, -35, 0, -15);
-    backButton.imageEdgeInsets = UIEdgeInsetsMake(0, 5, 0, 0);
-    backButton.py_width -= PYSEARCH_MARGIN;
+    backButton.py_width += 3;
     self.backButton = backButton;
     self.backBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backButton];
     
@@ -405,7 +451,7 @@
         [NSLayoutConstraint activateConstraints:@[
                                                   [searchBar.topAnchor constraintEqualToAnchor:titleView.topAnchor],
                                                   [searchBar.leftAnchor constraintEqualToAnchor:titleView.leftAnchor],
-                                                  [searchBar.rightAnchor constraintEqualToAnchor:titleView.rightAnchor constant:-PYSEARCH_MARGIN],
+                                                  [searchBar.rightAnchor constraintEqualToAnchor:titleView.rightAnchor],
                                                   [searchBar.bottomAnchor constraintEqualToAnchor:titleView.bottomAnchor]
                                                   ]];
     } else {
@@ -489,8 +535,9 @@
     self.baseSearchTableView.backgroundColor = [UIColor py_colorWithHexString:@"#efefef"];
     // remove all subviews in hotSearchTagsContentView
     [self.hotSearchTagsContentView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-  
+    
     CGFloat rectangleTagH = 40;
+    NSMutableArray *rectangleTagLabelsM = [NSMutableArray array];
     for (int i = 0; i < self.hotSearches.count; i++) {
         UILabel *rectangleTagLabel = [[UILabel alloc] init];
         rectangleTagLabel.userInteractionEnabled = YES;
@@ -505,7 +552,9 @@
         rectangleTagLabel.py_x = rectangleTagLabel.py_width * (i % PYRectangleTagMaxCol);
         rectangleTagLabel.py_y = rectangleTagLabel.py_height * (i / PYRectangleTagMaxCol);
         [contentView addSubview:rectangleTagLabel];
+        [rectangleTagLabelsM addObject:rectangleTagLabel];
     }
+    self.hotSearchTags = [rectangleTagLabelsM copy];
     contentView.py_height = CGRectGetMaxY(contentView.subviews.lastObject.frame);
     
     self.hotSearchView.py_height = CGRectGetMaxY(contentView.frame) + PYSEARCH_MARGIN * 2;
@@ -698,6 +747,15 @@
 }
 
 #pragma mark - setter
+- (void)setRankTextLabels:(NSArray<UILabel *> *)rankTextLabels
+{
+    // popular search tagLabel's tag is 1, search history tagLabel's tag is 0.
+    for (UILabel *rankLabel in rankTextLabels) {
+        rankLabel.tag = 1;
+    }
+    _rankTextLabels= rankTextLabels;
+}
+
 - (void)setSearchBarCornerRadius:(CGFloat)searchBarCornerRadius
 {
     _searchBarCornerRadius = searchBarCornerRadius;
@@ -1053,7 +1111,7 @@
     [searchBar resignFirstResponder];
     NSString *searchText = searchBar.text;
     if (self.removeSpaceOnSearchString) { // remove sapce on search string
-       searchText = [searchBar.text stringByReplacingOccurrencesOfString:@" " withString:@""];
+        searchText = [searchBar.text stringByReplacingOccurrencesOfString:@" " withString:@""];
     }
     if (self.showSearchHistory && searchText.length > 0) {
         [self.searchHistories removeObject:searchText];
@@ -1255,7 +1313,7 @@
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     self.searchBar.text = cell.textLabel.text;
-        
+    
     if ([self.delegate respondsToSelector:@selector(searchViewController:didSelectSearchHistoryAtIndex:searchText:)]) {
         [self.delegate searchViewController:self didSelectSearchHistoryAtIndex:indexPath.row searchText:cell.textLabel.text];
         [self saveSearchCacheAndRefreshView];
@@ -1271,6 +1329,18 @@
         self.searchSuggestionVC.tableView.contentInset = UIEdgeInsetsMake(-30, 0, 30, 0);
         [self.searchBar resignFirstResponder];
     }
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer*)gestureRecognizer
+{
+    return self.navigationController.childViewControllers.count > 1;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer*)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer*)otherGestureRecognizer
+{
+    return self.navigationController.viewControllers.count > 1;
 }
 
 @end
