@@ -210,6 +210,11 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
 @property (nonatomic, weak) id<PYSearchViewControllerDataSource> dataSource;
 
 /**
+ The text color
+ */
+@property (nonatomic, copy) UIColor *textColor;
+
+/**
  Ranking the background color of the corresponding hexadecimal string (eg: @"#ffcc99") array (just four colors) when `hotSearchStyle` is `PYHotSearchStyleRankTag`.
  */
 @property (nonatomic, strong) NSArray<NSString *> *rankTagBackgroundColorHexStrings;

@@ -328,7 +328,7 @@
     if (!_emptyButton) {
         UIButton *emptyButton = [[UIButton alloc] init];
         emptyButton.titleLabel.font = self.searchHistoryHeader.font;
-        [emptyButton setTitleColor:PYTextColor forState:UIControlStateNormal];
+        [emptyButton setTitleColor:_textColor forState:UIControlStateNormal];
         [emptyButton setTitle:[NSBundle py_localizedStringForKey:PYSearchEmptyButtonText] forState:UIControlStateNormal];
         [emptyButton setImage:[NSBundle py_imageNamed:@"empty"] forState:UIControlStateNormal];
         [emptyButton addTarget:self action:@selector(emptySearchHistoryDidClick) forControlEvents:UIControlEventTouchUpInside];
@@ -406,6 +406,7 @@
 - (void)setup
 {
     self.view.backgroundColor = [UIColor whiteColor];
+    self.textColor = PYSEARCH_COLOR(113, 113, 113);
     self.baseSearchTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.navigationController.navigationBar.backIndicatorImage = nil;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
@@ -527,7 +528,7 @@
     titleLabel.text = title;
     titleLabel.font = [UIFont systemFontOfSize:13];
     titleLabel.tag = 1;
-    titleLabel.textColor = PYTextColor;
+    titleLabel.textColor = _textColor;
     [titleLabel sizeToFit];
     titleLabel.py_x = 0;
     titleLabel.py_y = 0;
@@ -551,7 +552,7 @@
         UILabel *rectangleTagLabel = [[UILabel alloc] init];
         rectangleTagLabel.userInteractionEnabled = YES;
         rectangleTagLabel.font = [UIFont systemFontOfSize:14];
-        rectangleTagLabel.textColor = PYTextColor;
+        rectangleTagLabel.textColor = _textColor;
         rectangleTagLabel.backgroundColor = [UIColor clearColor];
         rectangleTagLabel.text = self.hotSearches[i];
         rectangleTagLabel.py_width = contentView.py_width / PYRectangleTagMaxCol;
@@ -624,7 +625,7 @@
         [rankTextLabel addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tagDidCLick:)]];
         rankTextLabel.textAlignment = NSTextAlignmentLeft;
         rankTextLabel.backgroundColor = [UIColor clearColor];
-        rankTextLabel.textColor = PYTextColor;
+        rankTextLabel.textColor = _textColor;
         rankTextLabel.font = [UIFont systemFontOfSize:14];
         rankTextLabel.py_x = CGRectGetMaxX(rankTag.frame) + PYSEARCH_MARGIN;
         rankTextLabel.py_width = (self.baseSearchTableView.py_width - PYSEARCH_MARGIN * 3) * 0.5 - rankTextLabel.py_x;
@@ -659,7 +660,7 @@
                 break;
             default: // Other
                 rankTag.backgroundColor = [UIColor py_colorWithHexString:self.rankTagBackgroundColorHexStrings[3]];
-                rankTag.textColor = PYTextColor;
+                rankTag.textColor = _textColor;
                 break;
         }
     }
@@ -756,6 +757,11 @@
 }
 
 #pragma mark - setter
+- (void)setTextColor:(UIColor *)textColor
+{
+    _textColor = textColor;
+}
+
 - (void)setRankTextLabels:(NSArray<UILabel *> *)rankTextLabels
 {
     // popular search tagLabel's tag is 1, search history tagLabel's tag is 0.
@@ -1275,7 +1281,7 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellID];
     if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
-        cell.textLabel.textColor = PYTextColor;
+        cell.textLabel.textColor = _textColor;
         cell.textLabel.font = [UIFont systemFontOfSize:14];
         cell.backgroundColor = [UIColor clearColor];
         
