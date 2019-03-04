@@ -215,6 +215,11 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
 @property (nonatomic, copy) UIColor *textColor;
 
 /**
+ The title color
+ */
+@property (nonatomic, copy) UIColor *titleColor;
+
+/**
  Ranking the background color of the corresponding hexadecimal string (eg: @"#ffcc99") array (just four colors) when `hotSearchStyle` is `PYHotSearchStyleRankTag`.
  */
 @property (nonatomic, strong) NSArray<NSString *> *rankTagBackgroundColorHexStrings;
@@ -270,6 +275,16 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
  The title of search history
  */
 @property (nonatomic, copy) NSString *searchHistoryTitle;
+
+/**
+ The color of icons in search history
+ */
+@property (nonatomic, copy) UIColor *searchHistoryIconColor;
+
+/**
+ The color of seperator lines in search history
+ */
+@property (nonatomic, copy) UIColor *searchHistorySeperatorColor;
 
 /**
  Whether show search history, default is YES.

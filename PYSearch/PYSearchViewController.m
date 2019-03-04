@@ -407,6 +407,7 @@
 {
     self.view.backgroundColor = [UIColor whiteColor];
     self.textColor = PYSEARCH_COLOR(113, 113, 113);
+    self.titleColor = PYSEARCH_COLOR(113, 113, 113);
     self.baseSearchTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.navigationController.navigationBar.backIndicatorImage = nil;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
@@ -489,6 +490,7 @@
     hotSearchView.py_width = headerView.py_width - hotSearchView.py_x * 2;
     hotSearchView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     UILabel *titleLabel = [self setupTitleLabel:[NSBundle py_localizedStringForKey:PYSearchHotSearchText]];
+    titleLabel.textColor = _titleColor;
     self.hotSearchHeader = titleLabel;
     [hotSearchView addSubview:titleLabel];
     UIView *hotSearchTagsContentView = [[UIView alloc] init];
@@ -505,7 +507,7 @@
     UIView *footerView = [[UIView alloc] init];
     footerView.py_width = PYScreenW;
     UILabel *emptySearchHistoryLabel = [[UILabel alloc] init];
-    emptySearchHistoryLabel.textColor = [UIColor darkGrayColor];
+    emptySearchHistoryLabel.textColor = _titleColor;
     emptySearchHistoryLabel.font = [UIFont systemFontOfSize:13];
     emptySearchHistoryLabel.userInteractionEnabled = YES;
     emptySearchHistoryLabel.text = [NSBundle py_localizedStringForKey:PYSearchEmptySearchHistoryText];
@@ -762,6 +764,13 @@
     _textColor = textColor;
 }
 
+- (void)setTitleColor:(UIColor *)titleColor
+{
+    _titleColor = titleColor;
+    [self.hotSearchHeader setTextColor:_titleColor];
+    [self.emptySearchHistoryLabel setTextColor:_titleColor];
+}
+
 - (void)setRankTextLabels:(NSArray<UILabel *> *)rankTextLabels
 {
     // popular search tagLabel's tag is 1, search history tagLabel's tag is 0.
@@ -808,6 +817,16 @@
     } else {
         self.searchHistoryHeader.text = _searchHistoryTitle;
     }
+}
+
+- (void)setSearchHistoryIconColor:(UIColor *)searchHistoryIconColor
+{
+    _searchHistoryIconColor = searchHistoryIconColor;
+}
+
+- (void)setSearchHistorySeperatorColor:(UIColor *)searchHistorySeperatorColor
+{
+    _searchHistorySeperatorColor = searchHistorySeperatorColor;
 }
 
 - (void)setShowSearchResultWhenSearchTextChanged:(BOOL)showSearchResultWhenSearchTextChanged
@@ -1287,12 +1306,23 @@
         
         UIButton *closetButton = [[UIButton alloc] init];
         closetButton.py_size = CGSizeMake(cell.py_height, cell.py_height);
-        [closetButton setImage:[NSBundle py_imageNamed:@"close"] forState:UIControlStateNormal];
-        UIImageView *closeView = [[UIImageView alloc] initWithImage:[NSBundle py_imageNamed:@"close"]];
+        UIImage *closeIcon;
+        if (_searchHistoryIconColor != NULL) {
+            closeIcon = [[NSBundle py_imageNamed:@"close"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            [closetButton setTintColor:_searchHistoryIconColor];
+        } else {
+            closeIcon = [NSBundle py_imageNamed:@"close"];
+        }
+        [closetButton setImage:closeIcon forState:UIControlStateNormal];
         [closetButton addTarget:self action:@selector(closeDidClick:) forControlEvents:UIControlEventTouchUpInside];
-        closeView.contentMode = UIViewContentModeCenter;
         cell.accessoryView = closetButton;
-        UIImageView *line = [[UIImageView alloc] initWithImage:[NSBundle py_imageNamed:@"cell-content-line"]];
+        UIImageView *line;
+        if (_searchHistorySeperatorColor != NULL) {
+            line = [[UIImageView alloc] initWithImage:[[NSBundle py_imageNamed:@"cell-content-line"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+            [line setTintColor:_searchHistorySeperatorColor];
+        } else {
+            line = [[UIImageView alloc] initWithImage:[NSBundle py_imageNamed:@"cell-content-line"]];
+        }
         line.py_height = PYOnePixel;
         line.alpha = 0.7;
         line.py_x = PYSEARCH_MARGIN;
@@ -1302,7 +1332,12 @@
         [cell.contentView addSubview:line];
     }
     
-    cell.imageView.image = [NSBundle py_imageNamed:@"search_history"];
+    if (_searchHistoryIconColor != NULL) {
+        cell.imageView.image = [[NSBundle py_imageNamed:@"search_history"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        [cell.imageView setTintColor:_searchHistoryIconColor];
+    } else {
+        cell.imageView.image = [NSBundle py_imageNamed:@"search_history"];
+    }
     cell.textLabel.text = self.searchHistories[indexPath.row];
     
     return cell;
@@ -1321,6 +1356,12 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
 {
     return 0.01;
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(UIView *)view forSection:(NSInteger)section
+{
+    UITableViewHeaderFooterView *header = (UITableViewHeaderFooterView *)view;
+    [header.textLabel setTextColor:_titleColor];
 }
 
 #pragma mark - UITableViewDelegate
