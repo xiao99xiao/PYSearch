@@ -277,7 +277,7 @@
 			};
 			buildConfigurationList = 6B97175E1DC48FA700B2DAA1 /* Build configuration list for PBXProject "PYSearchExample" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
