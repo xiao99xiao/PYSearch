@@ -9,7 +9,7 @@
 
 @class PYSearchViewController, PYSearchSuggestionViewController;
 
-typedef void(^PYDidSearchBlock)(PYSearchViewController *searchViewController, UISearchBar *searchBar, NSString *searchText);
+typedef void(^PYDidSearchBlock)(PYSearchViewController * _Nonnull searchViewController, UISearchBar * _Nonnull searchBar, NSString * _Nullable searchText);
 
 /**
  style of popular search
@@ -69,7 +69,7 @@ typedef NS_ENUM(NSInteger, PYSearchViewControllerShowMode) {
  @param indexPath               indexPath of row
  @return a `UITableViewCell` object
  */
-- (UITableViewCell *)searchSuggestionView:(UITableView *)searchSuggestionView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (UITableViewCell *_Nullable)searchSuggestionView:(UITableView *_Nonnull)searchSuggestionView cellForRowAtIndexPath:(NSIndexPath *_Nonnull)indexPath;
 
 /**
  Return number of rows in section.
@@ -78,7 +78,7 @@ typedef NS_ENUM(NSInteger, PYSearchViewControllerShowMode) {
  @param section                 index of section
  @return number of rows in section
  */
-- (NSInteger)searchSuggestionView:(UITableView *)searchSuggestionView numberOfRowsInSection:(NSInteger)section;
+- (NSInteger)searchSuggestionView:(UITableView *_Nonnull)searchSuggestionView numberOfRowsInSection:(NSInteger)section;
 
 /**
  Return number of sections in search suggestion view.
@@ -86,7 +86,7 @@ typedef NS_ENUM(NSInteger, PYSearchViewControllerShowMode) {
  @param searchSuggestionView    view which display search suggestions
  @return number of sections
  */
-- (NSInteger)numberOfSectionsInSearchSuggestionView:(UITableView *)searchSuggestionView;
+- (NSInteger)numberOfSectionsInSearchSuggestionView:(UITableView *_Nonnull)searchSuggestionView;
 
 /**
  Return height for row.
@@ -95,7 +95,7 @@ typedef NS_ENUM(NSInteger, PYSearchViewControllerShowMode) {
  @param indexPath               indexPath of row
  @return height of row
  */
-- (CGFloat)searchSuggestionView:(UITableView *)searchSuggestionView heightForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (CGFloat)searchSuggestionView:(UITableView *_Nonnull)searchSuggestionView heightForRowAtIndexPath:(NSIndexPath *_Nonnull)indexPath;
 
 @end
 
@@ -114,9 +114,9 @@ typedef NS_ENUM(NSInteger, PYSearchViewControllerShowMode) {
  @param searchBar               search bar
  @param searchText              text for search
  */
-- (void)searchViewController:(PYSearchViewController *)searchViewController
-      didSearchWithSearchBar:(UISearchBar *)searchBar
-                  searchText:(NSString *)searchText;
+- (void)searchViewController:(PYSearchViewController *_Nonnull)searchViewController
+      didSearchWithSearchBar:(UISearchBar *_Nonnull)searchBar
+                  searchText:(NSString *_Nullable)searchText;
 
 /**
  Called when popular search is selected.
@@ -127,9 +127,9 @@ typedef NS_ENUM(NSInteger, PYSearchViewControllerShowMode) {
  
  Note: `searchViewController:didSearchWithSearchBar:searchText:` will not be called when this method is implemented.
  */
-- (void)searchViewController:(PYSearchViewController *)searchViewController
+- (void)searchViewController:(PYSearchViewController *_Nonnull)searchViewController
    didSelectHotSearchAtIndex:(NSInteger)index
-                  searchText:(NSString *)searchText;
+                  searchText:(NSString *_Nullable)searchText;
 
 /**
  Called when search history is selected.
@@ -140,9 +140,9 @@ typedef NS_ENUM(NSInteger, PYSearchViewControllerShowMode) {
  
  Note: `searchViewController:didSearchWithSearchBar:searchText:` will not be called when this method is implemented.
  */
-- (void)searchViewController:(PYSearchViewController *)searchViewController
+- (void)searchViewController:(PYSearchViewController *_Nonnull)searchViewController
 didSelectSearchHistoryAtIndex:(NSInteger)index
-                  searchText:(NSString *)searchText;
+                  searchText:(NSString *_Nullable)searchText;
 
 /**
  Called when search suggestion is selected.
@@ -153,9 +153,9 @@ didSelectSearchHistoryAtIndex:(NSInteger)index
 
  Note: `searchViewController:didSearchWithSearchBar:searchText:` will not be called when this method is implemented.
  */
-- (void)searchViewController:(PYSearchViewController *)searchViewController
+- (void)searchViewController:(PYSearchViewController *_Nonnull)searchViewController
 didSelectSearchSuggestionAtIndex:(NSInteger)index
-                  searchText:(NSString *)searchText PYSEARCH_DEPRECATED("Use searchViewController:didSelectSearchSuggestionAtIndexPath:searchText:");
+                  searchText:(NSString *_Nullable)searchText PYSEARCH_DEPRECATED("Use searchViewController:didSelectSearchSuggestionAtIndexPath:searchText:");
 
 /**
  Called when search suggestion is selected, the method support more custom of search suggestion view.
@@ -167,8 +167,8 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
  Note: `searchViewController:didSearchWithSearchBar:searchText:` and `searchViewController:didSelectSearchSuggestionAtIndex:searchText:` will not be called when this method is implemented.
  Suggestion: To ensure that can cache selected custom search suggestion records, you need to set `searchBar.text` = "custom search text".
  */
-- (void)searchViewController:(PYSearchViewController *)searchViewController didSelectSearchSuggestionAtIndexPath:(NSIndexPath *)indexPath
-                   searchBar:(UISearchBar *)searchBar;
+- (void)searchViewController:(PYSearchViewController *_Nonnull)searchViewController didSelectSearchSuggestionAtIndexPath:(NSIndexPath *_Nonnull)indexPath
+                   searchBar:(UISearchBar *_Nonnull)searchBar;
 
 /**
  Called when search text did change, you can reload data of suggestion view thought this method.
@@ -177,23 +177,23 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
  @param searchBar               search bar
  @param searchText              text for search
  */
-- (void)searchViewController:(PYSearchViewController *)searchViewController
-         searchTextDidChange:(UISearchBar *)searchBar
-                  searchText:(NSString *)searchText;
+- (void)searchViewController:(PYSearchViewController *_Nonnull)searchViewController
+         searchTextDidChange:(UISearchBar *_Nonnull)searchBar
+                  searchText:(NSString *_Nullable)searchText;
 
 /**
  Called when cancel item did press, default execute `[self dismissViewControllerAnimated:YES completion:nil]`.
 
  @param searchViewController search view controller
  */
-- (void)didClickCancel:(PYSearchViewController *)searchViewController;
+- (void)didClickCancel:(PYSearchViewController *_Nonnull)searchViewController;
 
 /**
  Called when back item did press, default execute `[self.navigationController popViewControllerAnimated:YES]`.
  
  @param searchViewController search view controller
  */
-- (void)didClickBack:(PYSearchViewController *)searchViewController;
+- (void)didClickBack:(PYSearchViewController *_Nonnull)searchViewController;
 
 @end
 
@@ -202,32 +202,32 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
 /**
  The delegate
  */
-@property (nonatomic, weak) id<PYSearchViewControllerDelegate> delegate;
+@property (nullable, nonatomic, weak) id<PYSearchViewControllerDelegate> delegate;
 
 /**
  The data source
  */
-@property (nonatomic, weak) id<PYSearchViewControllerDataSource> dataSource;
+@property (nullable, nonatomic, weak) id<PYSearchViewControllerDataSource> dataSource;
 
 /**
  The text color
  */
-@property (nonatomic, copy) UIColor *textColor;
+@property (nullable, nonatomic, copy) UIColor * textColor;
 
 /**
  The title color
  */
-@property (nonatomic, copy) UIColor *titleColor;
+@property (nullable, nonatomic, copy) UIColor * titleColor;
 
 /**
  Ranking the background color of the corresponding hexadecimal string (eg: @"#ffcc99") array (just four colors) when `hotSearchStyle` is `PYHotSearchStyleRankTag`.
  */
-@property (nonatomic, strong) NSArray<NSString *> *rankTagBackgroundColorHexStrings;
+@property (nullable, nonatomic, strong) NSArray<NSString *> * rankTagBackgroundColorHexStrings;
 
 /**
  The pool of color which are use in colorful tag when `hotSearchStyle` is `PYHotSearchStyleColorfulTag`.
  */
-@property (nonatomic, strong) NSMutableArray<UIColor *> *colorPol;
+@property (nullable, nonatomic, strong) NSMutableArray<UIColor *> * colorPol;
 
 /**
  Whether swap the popular search and search history location, default is NO.
@@ -239,17 +239,17 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
 /**
  The element of popular search
  */
-@property (nonatomic, copy) NSArray<NSString *> *hotSearches;
+@property (nullable, nonatomic, copy) NSArray<NSString *> * hotSearches;
 
 /**
  The tags of popular search
  */
-@property (nonatomic, copy) NSArray<UILabel *> *hotSearchTags;
+@property (nullable, nonatomic, copy) NSArray<UILabel *> * hotSearchTags;
 
 /**
  The label of popular search header
  */
-@property (nonatomic, weak) UILabel *hotSearchHeader;
+@property (nullable, nonatomic, weak) UILabel * hotSearchHeader;
 
 /**
  Whether show popular search, default is YES.
@@ -259,32 +259,32 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
 /**
  The title of popular search
  */
-@property (nonatomic, copy) NSString *hotSearchTitle;
+@property (nullable, nonatomic, copy) NSString * hotSearchTitle;
 
 /**
  The tags of search history
  */
-@property (nonatomic, copy) NSArray<UILabel *> *searchHistoryTags;
+@property (nullable, nonatomic, copy) NSArray<UILabel *> * searchHistoryTags;
 
 /**
  The label of search history header
  */
-@property (nonatomic, weak) UILabel *searchHistoryHeader;
+@property (nullable, nonatomic, weak) UILabel * searchHistoryHeader;
 
 /**
  The title of search history
  */
-@property (nonatomic, copy) NSString *searchHistoryTitle;
+@property (nullable, nonatomic, copy) NSString * searchHistoryTitle;
 
 /**
  The color of icons in search history
  */
-@property (nonatomic, copy) UIColor *searchHistoryIconColor;
+@property (nullable, nonatomic, copy) UIColor * searchHistoryIconColor;
 
 /**
  The color of seperator lines in search history
  */
-@property (nonatomic, copy) UIColor *searchHistorySeperatorColor;
+@property (nullable, nonatomic, copy) UIColor * searchHistorySeperatorColor;
 
 /**
  Whether show search history, default is YES.
@@ -296,7 +296,7 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
 /**
  The path of cache search record, default is `PYSEARCH_SEARCH_HISTORY_CACHE_PATH`.
  */
-@property (nonatomic, copy) NSString *searchHistoriesCachePath;
+@property (nonnull, nonatomic, copy) NSString * searchHistoriesCachePath;
 
 /**
  The number of cache search record, default is 20.
@@ -311,12 +311,12 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
 /**
  The button of empty search record when `searchHistoryStyle` is’t `PYSearchHistoryStyleCell`.
  */
-@property (nonatomic, weak) UIButton *emptyButton;
+@property (nullable, nonatomic, weak) UIButton * emptyButton;
 
 /**
  The label od empty search record when `searchHistoryStyle` is `PYSearchHistoryStyleCell`.
  */
-@property (nonatomic, weak) UILabel *emptySearchHistoryLabel;
+@property (nullable, nonatomic, weak) UILabel * emptySearchHistoryLabel;
 
 /**
  The style of popular search, default is `PYHotSearchStyleNormalTag`.
@@ -341,17 +341,17 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
 /**
  The search bar
  */
-@property (nonatomic, weak) UISearchBar *searchBar;
+@property (nullable, nonatomic, weak) UISearchBar * searchBar;
 
 /**
  The text field of search bar
  */
-@property (nonatomic, weak) UITextField *searchTextField;
+@property (nullable, nonatomic, weak) UITextField *searchTextField;
 
 /**
  The background color of search bar.
  */
-@property (nonatomic, strong) UIColor *searchBarBackgroundColor;
+@property (nullable, nonatomic, strong) UIColor *searchBarBackgroundColor;
 
 /**
  The cornerRadius of `_UISearchBarSearchFieldBackgroundView` which from `self.searchTextField.subviews`, default is 0.0.
@@ -361,39 +361,39 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
 /**
  The barButtonItem of cancel
  */
-@property (nonatomic, strong) UIBarButtonItem *cancelBarButtonItem;
+@property (nonnull, nonatomic, strong) UIBarButtonItem *cancelBarButtonItem;
 
 /**
  The customView of cancelBarButtonItem
  */
-@property (nonatomic, weak) UIButton *cancelButton;
+@property (nullable, nonatomic, weak) UIButton *cancelButton;
 
 /**
  The barButtonItem of back
  */
-@property (nonatomic, strong) UIBarButtonItem *backBarButtonItem;
+@property (nonnull, nonatomic, strong) UIBarButtonItem *backBarButtonItem;
 
 /**
  The customView of backBarButtonItem
  */
-@property (nonatomic, weak) UIButton *backButton;
+@property (nullable, nonatomic, weak) UIButton *backButton;
 
 /**
  The search suggestion view
  */
-@property (nonatomic, weak, readonly) UITableView *searchSuggestionView;
+@property (nullable, nonatomic, weak, readonly) UITableView *searchSuggestionView;
 
 /**
  The block which invoked when search begain.
  */
-@property (nonatomic, copy) PYDidSearchBlock didSearchBlock;
+@property (nullable, nonatomic, copy) PYDidSearchBlock didSearchBlock;
 
 /**
  The element of search suggestions
  
  Note: it is't effective when `searchSuggestionHidden` is NO or cell of suggestion view is custom.
  */
-@property (nonatomic, copy) NSArray<NSString *> *searchSuggestions;
+@property (nullable, nonatomic, copy) NSArray<NSString *> *searchSuggestions;
 
 /**
  Whether hidden search suggstion view, default is NO.
@@ -403,7 +403,7 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
 /**
  The view controller of search result.
  */
-@property (nonatomic, strong) UIViewController *searchResultController;
+@property (nullable, nonatomic, strong) UIViewController *searchResultController;
 
 /**
  Whether show search result view when search text did change, default is NO.
@@ -431,8 +431,8 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
  @param placeholder     placeholder of search bar
  @return new instance of `PYSearchViewController` class
  */
-+ (instancetype)searchViewControllerWithHotSearches:(NSArray<NSString *> *)hotSearches
-                               searchBarPlaceholder:(NSString *)placeholder;
++ (instancetype _Nonnull )searchViewControllerWithHotSearches:(NSArray<NSString *> *_Nonnull)hotSearches
+                                         searchBarPlaceholder:(NSString *_Nullable)placeholder;
 
 /**
  Creates an instance of searchViewContoller with popular searches, search bar's placeholder and the block which invoked when search begain.
@@ -444,8 +444,8 @@ didSelectSearchSuggestionAtIndex:(NSInteger)index
  
  Note: The `delegate` has a priority greater than the `block`, `block` is't effective when `searchViewController:didSearchWithSearchBar:searchText:` is implemented.
  */
-+ (instancetype)searchViewControllerWithHotSearches:(NSArray<NSString *> *)hotSearches
-                               searchBarPlaceholder:(NSString *)placeholder
-                                     didSearchBlock:(PYDidSearchBlock)block;
++ (instancetype _Nonnull )searchViewControllerWithHotSearches:(NSArray<NSString *> *_Nonnull)hotSearches
+                               searchBarPlaceholder:(NSString *_Nullable)placeholder
+                                               didSearchBlock:(PYDidSearchBlock _Nullable )block;
 
 @end

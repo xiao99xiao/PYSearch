@@ -178,7 +178,9 @@
         }
         searchBar.py_height = self.view.py_width > self.view.py_height ? 24 : 30;
         searchBar.py_width = self.view.py_width - adaptWidth - PYSEARCH_MARGIN;
-        searchField.frame = searchBar.bounds;
+        if (searchField != NULL) {
+            searchField.frame = searchBar.bounds;
+        }
         cancelButton.py_width = self.cancelButtonWidth;
     } else {
         titleView.py_y = self.view.py_width > self.view.py_height ? 4 : 7;
@@ -472,6 +474,20 @@
     searchBar.placeholder = [NSBundle py_localizedStringForKey:PYSearchSearchPlaceholderText];
     searchBar.backgroundImage = [NSBundle py_imageNamed:@"clearImage"];
     searchBar.delegate = self;
+#if defined(__IPHONE_13_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0
+    if (@available(iOS 13, *)) {
+        _searchTextField = searchBar.searchTextField;
+    } else {
+        for (UIView *subView in [[searchBar.subviews lastObject] subviews]) {
+            if ([[subView class] isSubclassOfClass:[UITextField class]]) {
+                UITextField *textField = (UITextField *)subView;
+                textField.font = [UIFont systemFontOfSize:16];
+                _searchTextField = textField;
+                break;
+            }
+        }
+    }
+#else
     for (UIView *subView in [[searchBar.subviews lastObject] subviews]) {
         if ([[subView class] isSubclassOfClass:[UITextField class]]) {
             UITextField *textField = (UITextField *)subView;
@@ -480,6 +496,7 @@
             break;
         }
     }
+#endif
     self.searchBar = searchBar;
     
     UIView *headerView = [[UIView alloc] init];
@@ -890,7 +907,9 @@
 - (void)setSearchBarBackgroundColor:(UIColor *)searchBarBackgroundColor
 {
     _searchBarBackgroundColor = searchBarBackgroundColor;
-    _searchTextField.backgroundColor = searchBarBackgroundColor;
+    if (_searchTextField != NULL) {
+        _searchTextField.backgroundColor = searchBarBackgroundColor;
+    }
 }
 
 - (void)setSearchSuggestions:(NSArray<NSString *> *)searchSuggestions
