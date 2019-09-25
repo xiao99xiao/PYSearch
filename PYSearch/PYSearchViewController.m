@@ -176,10 +176,12 @@
                 [leftLayoutConstraint setConstant:PYSEARCH_MARGIN - navigationBarLayoutMargins.left];
             }
         }
-        searchBar.py_height = self.view.py_width > self.view.py_height ? 24 : 30;
-        searchBar.py_width = self.view.py_width - adaptWidth - PYSEARCH_MARGIN;
-        if (searchField != NULL) {
-            searchField.frame = searchBar.bounds;
+        if (searchBar != NULL) {
+            searchBar.py_height = self.view.py_width > self.view.py_height ? 24 : 30;
+            searchBar.py_width = self.view.py_width - adaptWidth - PYSEARCH_MARGIN;
+            if (searchField != NULL) {
+                searchField.frame = searchBar.bounds;
+            }
         }
         cancelButton.py_width = self.cancelButtonWidth;
     } else {
@@ -800,7 +802,20 @@
 - (void)setSearchBarCornerRadius:(CGFloat)searchBarCornerRadius
 {
     _searchBarCornerRadius = searchBarCornerRadius;
-    
+    #if defined(__IPHONE_13_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0
+    if (@available(iOS 13, *)) {
+        self.searchTextField.layer.cornerRadius = searchBarCornerRadius;
+        self.searchTextField.layer.masksToBounds = YES;
+    } else {
+        for (UIView *subView in self.searchTextField.subviews) {
+            if ([NSStringFromClass([subView class]) isEqualToString:@"_UISearchBarSearchFieldBackgroundView"]) {
+                subView.layer.cornerRadius = searchBarCornerRadius;
+                subView.clipsToBounds = YES;
+                break;
+            }
+        }
+    }
+    #else
     for (UIView *subView in self.searchTextField.subviews) {
         if ([NSStringFromClass([subView class]) isEqualToString:@"_UISearchBarSearchFieldBackgroundView"]) {
             subView.layer.cornerRadius = searchBarCornerRadius;
@@ -808,6 +823,7 @@
             break;
         }
     }
+    #endif
 }
 
 - (void)setSwapHotSeachWithSearchHistory:(BOOL)swapHotSeachWithSearchHistory
